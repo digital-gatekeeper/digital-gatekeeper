@@ -1,0 +1,44 @@
+version: "3"
+
+services:
+  backend:
+    build: ./back
+    container_name: backend
+    volumes:
+      - ./back:/app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - back
+
+  frontend:
+    build: ./front
+    container_name: frontend
+    volumes:
+      - ./front:/app
+    ports:
+      - "8900:5173"
+    depends_on:
+      - backend
+
+  db:
+    image: mysql:latest
+    container_name: mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: gatekeeper
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - back
+
+volumes:
+  mysql_data:
+networks:
+  back:

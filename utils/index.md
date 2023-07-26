@@ -28,6 +28,9 @@ Différentes façon d'ouvrir
 - Gestion des clients
 - Gestion des logs
 
+### todo
+- Faire les fixture
+
 ## Backdoor
 - IPV6 pour l'identification de la porte
 - Activer ouverture et fermeture de la porte
