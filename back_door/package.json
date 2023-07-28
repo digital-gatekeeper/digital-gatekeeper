@@ -10,13 +10,14 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^20.4.5",
+    "@types/redis": "^4.0.11",
     "nodemon": "^3.0.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.6"
   },
   "dependencies": {
     "@types/express": "^4.17.17",
+    "@types/node": "^20.4.5",
     "express": "^4.18.2",
     "onoff": "^6.0.3",
     "redis": "^4.6.7"
