@@ -1,14 +1,42 @@
 import { Request, Response } from 'express';
+import StepperMotorService from './StepperMotorService';
 
-const DoorService = {
-  open: (req: Request, res: Response) => {
-    const doorId = req.params.id;
-    res.send({ door: doorId});
-  },
+interface MotorData {
+  id: string;
+  pins: number[];
+  doorNumber: number;
+}
 
-  close: () => {
+class DoorService {
+  private stepperMotor: StepperMotorService;
 
+  constructor(stepperMotor: StepperMotorService) {
+    this.stepperMotor = stepperMotor;
+  }
+
+  create = (req: Request) => {
+    const motorData: MotorData = {
+      id: req.params.id,
+      pins: req.params.pins.split(',').map(pin => parseInt(pin)),
+      doorNumber: parseInt(req.params.doorNumber)
+    };
+
+    this.stepperMotor.createMotor(motorData);
+  }
+
+  read = (id: number) => {
+    this.stepperMotor.readMotor(id);
+  }
+
+  open = (req: Request) => {
+    const doorId: number = parseInt(req.params.id);
+    this.stepperMotor.rotateClockwise(doorId);
+  }
+
+  close = (req: Request) => {
+    const doorId: number = parseInt(req.params.id);
+    this.stepperMotor.rotateCounterClockwise(doorId);
   }
 }
 
-module.exports = DoorService;
+export default DoorService;
