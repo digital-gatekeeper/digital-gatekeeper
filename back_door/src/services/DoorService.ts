@@ -14,23 +14,42 @@ class DoorService {
     this.stepperMotor = stepperMotor;
   }
 
-  create = (req: Request) => {
-    const motorData: MotorData = {
-      id: req.params.id,
-      pins: req.params.pins.split(',').map(pin => parseInt(pin)),
-      doorNumber: parseInt(req.params.doorNumber)
-    };
+  create = (req: Request, res: Response) => {
+    try {
+      const motorData: MotorData = {
+        id: req.body.doorId,
+        pins: req.body.pins,
+        doorNumber: parseInt(req.body.doorId)
+      };
 
-    this.stepperMotor.createMotor(motorData);
+      this.stepperMotor.createMotor(motorData);
+
+      res.status(200).json({ message: "Motor created successfully" });
+    } catch (error) {
+      res.status(500).json({ error: "An error occurred while creating the motor" });
+    }
   }
 
-  read = (id: number) => {
-    this.stepperMotor.readMotor(id);
+  async read(req: Request, res: Response) {
+    try {
+      const id = parseInt(req.params.id);
+      const motor = await this.stepperMotor.readMotor(id);
+
+      if (!motor) {
+        res.status(404).json({ success: false, error: 'Door not found' });
+        return;
+      }
+
+      res.status(200).json({ success: true, data: motor });
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to retrieve door data" });
+    }
   }
 
-  open = (req: Request) => {
+  open = (req: Request, res: Response) => {
     const doorId: number = parseInt(req.params.id);
     this.stepperMotor.rotateClockwise(doorId);
+    res.status(200).json({ success: true });
   }
 
   close = (req: Request) => {

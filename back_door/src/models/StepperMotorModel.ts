@@ -1,43 +1,50 @@
-import client from '../services/redisService';
+import { RedisClientType } from 'redis';
 
 interface MotorData {
-    id: string;
-    pins: number[];
-    doorNumber: number;
+  id: string;
+  pins: number[];
+  doorNumber: number;
 }
 
 class StepperMotorModel {
-    async create(motorData: MotorData): Promise<void> {
-        const fieldsAdded = await client.hSet(
-            `motor:${motorData.id}`,
-            {
-                'id': motorData.id,
-                'pins': JSON.stringify(motorData.pins),
-                'doorNumber': motorData.doorNumber.toString()
-            },
-        )
-    }
+  private client: RedisClientType;
 
-    async update(motorData: MotorData): Promise<void> {
-        const fieldsUpdated = await client.hSet(
-            `motor:${motorData.id}`,
-            {
-                'id': motorData.id,
-                'pins': JSON.stringify(motorData.pins),
-                'doorNumber': motorData.doorNumber.toString()
-            },
-        )
-    }
+  constructor(client: RedisClientType) {
+    this.client = client;
+  }
 
-    async delete(id: number): Promise<void> {
-        const fieldsDeleted = await client.del(`motor:${id}`);
+  async create(motorData: MotorData): Promise<void> {
+    try {
+      const motorDataJSON = JSON.stringify(motorData)
+      const motor = await this.client.set(
+        `motor:${motorData.id}`, motorDataJSON
+      )
+    } catch (error: any) {
+      console.log(error.message);
     }
+  }
 
-    async read(id: number) {
-        const motor = await client.hGetAll(`motor:${id}`);
-        motor.pins = JSON.parse(motor.pins);
-        return motor;
+  async update(motorData: MotorData): Promise<void> {
+   
+  }
+
+  async delete(id: number): Promise<void> {
+    const fieldsDeleted = await this.client.del(`motor:${id}`);
+  }
+
+  async read(id: number) {
+    try {
+      const motor = await this.client.get(`motor:${id}`);
+      
+      if (!motor) {
+        throw new Error('No data for the motor');
+      }
+
+      return JSON.parse(motor);
+    } catch (error: any) {
+      console.log(error.message);
     }
+  }
 }
 
 export default StepperMotorModel;

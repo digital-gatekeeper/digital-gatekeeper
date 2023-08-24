@@ -1,5 +1,6 @@
 import { Gpio } from 'onoff';
 import StepperMotorModel from "../models/StepperMotorModel";
+import client from '../services/redisService';
 
 interface MotorData {
   id: string;
@@ -23,7 +24,7 @@ class StepperMotorService {
   ];
 
   constructor() {
-    this.model = new StepperMotorModel();
+    this.model = new StepperMotorModel(client);
   }
 
   async createMotor(motorData: MotorData): Promise<void> {
@@ -39,57 +40,65 @@ class StepperMotorService {
   }
 
   async readMotor(id: number) {
-    return this.model.read(id);
+    const motor = await this.model.read(id);
+    return motor;
   }
 
   async rotateClockwise(id: number): Promise<void> {
     const motorData = await this.model.read(id);
-    const pins: Gpio[] = motorData.pins.split(',').map(
-      pin => new Gpio(parseInt(pin), 'out')
-    );
+    console.log(motorData);
+    if (motorData) {
+      const pins: Gpio[] = motorData.pins.map(
+        (pin: number) => new Gpio(pin, 'out')
+      );
 
-    for (let pin = 0; pin < 4; pin++) {
-      if (this.Seq[this.stepCounter][pin] != 0) {
-        pins[pin].writeSync(1);
-      } else {
-        pins[pin].writeSync(0);
+      for (let pin = 0; pin < 4; pin++) {
+        if (this.Seq[this.stepCounter][pin] != 0) {
+          pins[pin].writeSync(1);
+          console.log(pins[pin]);
+        } else {
+          pins[pin].writeSync(0);
+        }
       }
-    }
 
-    this.stepCounter += 1;
-    if (this.stepCounter == this.stepCount) {
-      this.stepCounter = 0;
+      this.stepCounter += 1;
+      if (this.stepCounter == this.stepCount) {
+        this.stepCounter = 0;
+      }
+      if (this.stepCounter < 0) {
+        this.stepCounter = this.stepCount;
+      }
+
+      setTimeout(() => this.rotateClockwise(id), 500);
     }
-    if (this.stepCounter < 0) {
-      this.stepCounter = this.stepCount;
-    }
-    
-    setTimeout(() => this.rotateClockwise(id), 500);
   }
 
   async rotateCounterClockwise(id: number): Promise<void> {
     const motorData = await this.model.read(id);
-    const pins: Gpio[] = motorData.pins.split(',').map(
-      pin => new Gpio(parseInt(pin), 'out')
-    );
 
-    for (let pin = 0; pin < 4; pin++) {
-      if (this.Seq[this.stepCounter][pin] != 0) {
-        pins[pin].writeSync(0);
-      } else {
-        pins[pin].writeSync(1);
+    if (motorData) {
+      const pins: Gpio[] = motorData.pins.split(',').map(
+        (pin: number) => new Gpio(pin, 'out')
+      );
+
+      for (let pin = 0; pin < 4; pin++) {
+        if (this.Seq[this.stepCounter][pin] != 0) {
+          pins[pin].writeSync(0);
+        } else {
+          pins[pin].writeSync(1);
+        }
       }
-    }
 
-    this.stepCounter -= 1;
-    if (this.stepCounter == this.stepCount) {
-      this.stepCounter = 0;
-    }
-    if (this.stepCounter < 0) {
-      this.stepCounter = this.stepCount;
-    }
+      this.stepCounter -= 1;
+      if (this.stepCounter == this.stepCount) {
+        this.stepCounter = 0;
+      }
+      if (this.stepCounter < 0) {
+        this.stepCounter = this.stepCount;
+      }
 
-    setTimeout(() => this.rotateCounterClockwise(id), 500);
+      setTimeout(() => this.rotateCounterClockwise(id), 500);
+    }
   }
 }
 
