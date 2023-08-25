@@ -19,13 +19,18 @@ class StepperMotorModel {
       const motor = await this.client.set(
         `motor:${motorData.id}`, motorDataJSON
       )
+
+      if (!motor) {
+        throw new Error('Motor not created');
+      }
+      
     } catch (error: any) {
       console.log(error.message);
     }
   }
 
   async update(motorData: MotorData): Promise<void> {
-   
+    
   }
 
   async delete(id: number): Promise<void> {
