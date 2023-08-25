@@ -9,10 +9,13 @@ interface MotorData {
 }
 
 class StepperMotorService {
+  stepPerRevolution: number = 4076;
+  // stepPerRevolution: number = 16;
   model: StepperMotorModel;
+  delayBetweenStep: number = 0.005;
   stepCounter: number = 0;
-  stepCount: number = 8;
-  Seq: number[][] = [
+  maxSteps: number = 8;
+  seq: number[][] = [
     [1, 0, 0, 0],
     [1, 1, 0, 0],
     [0, 1, 0, 0],
@@ -46,30 +49,26 @@ class StepperMotorService {
 
   async rotateClockwise(id: number): Promise<void> {
     const motorData = await this.model.read(id);
-    console.log(motorData);
+
     if (motorData) {
       const pins: Gpio[] = motorData.pins.map(
         (pin: number) => new Gpio(pin, 'out')
       );
 
-      for (let pin = 0; pin < 4; pin++) {
-        if (this.Seq[this.stepCounter][pin] != 0) {
-          pins[pin].writeSync(1);
-          console.log(pins[pin]);
-        } else {
-          pins[pin].writeSync(0);
+      for (let i = 0; i < this.stepPerRevolution; i++) {
+        console.log(`------ step ${i + 1} ------`);
+
+        this.setStep(pins);
+
+        this.stepCounter += 1;
+        if (this.stepCounter == this.maxSteps) {
+          this.stepCounter = 0;
         }
+
+        await new Promise(resolve => setTimeout(resolve, this.delayBetweenStep));
       }
 
-      this.stepCounter += 1;
-      if (this.stepCounter == this.stepCount) {
-        this.stepCounter = 0;
-      }
-      if (this.stepCounter < 0) {
-        this.stepCounter = this.stepCount;
-      }
-
-      setTimeout(() => this.rotateClockwise(id), 500);
+      this.stop(pins);
     }
   }
 
@@ -77,28 +76,41 @@ class StepperMotorService {
     const motorData = await this.model.read(id);
 
     if (motorData) {
-      const pins: Gpio[] = motorData.pins.split(',').map(
+      const pins: Gpio[] = motorData.pins.map(
         (pin: number) => new Gpio(pin, 'out')
       );
 
-      for (let pin = 0; pin < 4; pin++) {
-        if (this.Seq[this.stepCounter][pin] != 0) {
-          pins[pin].writeSync(0);
-        } else {
-          pins[pin].writeSync(1);
+      this.stepCounter = this.maxSteps - 1;
+
+      for (let i = 0; i < this.stepPerRevolution; i++) {
+        console.log(`------ step ${i + 1} ------`);
+
+        this.setStep(pins);
+
+        this.stepCounter -= 1;
+        if (this.stepCounter < 0) {
+          this.stepCounter = this.maxSteps - 1;
         }
-      }
 
-      this.stepCounter -= 1;
-      if (this.stepCounter == this.stepCount) {
-        this.stepCounter = 0;
+        await new Promise(resolve => setTimeout(resolve, this.delayBetweenStep));
       }
-      if (this.stepCounter < 0) {
-        this.stepCounter = this.stepCount;
-      }
-
-      setTimeout(() => this.rotateCounterClockwise(id), 500);
     }
+  }
+
+  private setStep(pins: Gpio[]) {
+    for (let pin = 0; pin < 4; pin++) {
+      if (this.seq[this.stepCounter][pin] != 0) {
+        pins[pin].writeSync(1);
+        console.log(pin, 'is 1');
+      } else {
+        pins[pin].writeSync(0);
+        console.log(pin, 'is 0');
+      }
+    }
+  }
+
+  private stop(pins: Gpio[]) {
+    pins.forEach(pin => pin.writeSync(0));
   }
 }
 

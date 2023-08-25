@@ -52,9 +52,11 @@ class DoorService {
     res.status(200).json({ success: true });
   }
 
-  close = (req: Request) => {
+  close = (req: Request, res: Response) => {
     const doorId: number = parseInt(req.params.id);
     this.stepperMotor.rotateCounterClockwise(doorId);
+    res.status(200).json({ success: true });
+
   }
 }
 
