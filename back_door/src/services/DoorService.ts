@@ -47,15 +47,24 @@ class DoorService {
   }
 
   open = (req: Request, res: Response) => {
-    const doorId: number = parseInt(req.params.id);
-    this.stepperMotor.rotateClockwise(doorId);
-    res.status(200).json({ success: true });
+    try {
+      const doorId: number = parseInt(req.params.id);
+      this.stepperMotor.rotateClockwise(doorId);
+      res.status(200).json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to open the door" });
+    }
+
   }
 
   close = (req: Request, res: Response) => {
-    const doorId: number = parseInt(req.params.id);
-    this.stepperMotor.rotateCounterClockwise(doorId);
-    res.status(200).json({ success: true });
+    try {
+      const doorId: number = parseInt(req.params.id);
+      this.stepperMotor.rotateCounterClockwise(doorId);
+      res.status(200).json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to close the door" });
+    }
 
   }
 }
