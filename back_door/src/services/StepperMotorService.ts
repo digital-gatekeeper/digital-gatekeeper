@@ -17,6 +17,7 @@ class StepperMotorService {
   delayBetweenStep: number = 0.005;
   stepCounter: number = 0;
   maxSteps: number = 8;
+  pins: Gpio[] = [];
   seq: number[][] = [
     [1, 0, 0, 0],
     [1, 1, 0, 0],
@@ -74,14 +75,12 @@ class StepperMotorService {
     const motorData = await this.model.read(id);
 
     if (motorData) {
-      const pins: Gpio[] = motorData.pins.map(
-        (pin: number) => new Gpio(pin, 'out')
-      );
+      this.setPinsToOutput(motorData);
 
       for (let i = 0; i < this.stepPerRevolution; i++) {
-        this.setStep(pins);
+        this.setStep(this.pins);
 
-        this.stepCounter += 12;
+        this.stepCounter++;
         if (this.stepCounter == this.maxSteps) {
           this.stepCounter = 0;
         }
@@ -89,7 +88,7 @@ class StepperMotorService {
         await new Promise(resolve => setTimeout(resolve, this.delayBetweenStep));
       }
 
-      this.stop(pins);
+      this.stop(this.pins);
     }
   }
 
@@ -101,16 +100,13 @@ class StepperMotorService {
     const motorData = await this.model.read(id);
 
     if (motorData) {
-      const pins: Gpio[] = motorData.pins.map(
-        (pin: number) => new Gpio(pin, 'out')
-      );
-
+      this.setPinsToOutput(motorData);
       this.stepCounter = this.maxSteps - 1;
 
       for (let i = 0; i < this.stepPerRevolution; i++) {
-        this.setStep(pins);
+        this.setStep(this.pins);
 
-        this.stepCounter -= 1;
+        this.stepCounter--;
         if (this.stepCounter < 0) {
           this.stepCounter = this.maxSteps - 1;
         }
@@ -118,7 +114,7 @@ class StepperMotorService {
         await new Promise(resolve => setTimeout(resolve, this.delayBetweenStep));
       }
 
-      this.stop(pins);
+      this.stop(this.pins);
     }
   }
 
@@ -142,6 +138,16 @@ class StepperMotorService {
    */
   private stop(pins: Gpio[]) {
     pins.forEach(pin => pin.writeSync(0));
+  }
+
+  /**
+   * Set the GPIO pins of the motor to output mode.
+   * @param motorData - The data for the motor.
+   */
+  private setPinsToOutput(motorData: MotorData) {
+    this.pins = motorData.pins.map(
+      (pin: number) => new Gpio(pin, 'out')
+    );
   }
 }
 
