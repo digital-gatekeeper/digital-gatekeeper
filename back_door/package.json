@@ -20,6 +20,7 @@
     "@types/express": "^4.17.17",
     "@types/node": "^20.4.5",
     "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
     "express": "^4.18.2",
     "onoff": "^6.0.3",
     "redis": "^4.6.7"
