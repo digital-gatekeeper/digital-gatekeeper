@@ -76,6 +76,11 @@ class StepperMotorService {
     return motor;
   }
 
+  /**
+   * Get the status of a motor.
+   * @param id - The ID of the motor to get the status of.
+   * @returns The status of the motor.
+   */
   async getStatus(id: number) {
     const status = await this.model.getStatus(id);
     return status;
@@ -85,9 +90,9 @@ class StepperMotorService {
    * Rotate the motor clockwise.
    * @param id - The ID of the motor to rotate.
    */
-  async rotateClockwise(id: number): Promise<void> {
+  async rotateClockwise(id: number): Promise<boolean> {
     if (this.isRunning) {
-      return;
+      return false;
     }
 
     const motorData = await this.model.read(id);
@@ -113,15 +118,17 @@ class StepperMotorService {
       this.isRunning = false;
       this.model.setStatus(id, 'opened');
     }
+
+    return true;
   }
 
   /**
    * Rotate the motor counter-clockwise.
    * @param id - The ID of the motor to rotate.
    */
-  async rotateCounterClockwise(id: number): Promise<void> {
+  async rotateCounterClockwise(id: number): Promise<boolean> {
     if (this.isRunning) {
-      return;
+      return false;
     }
 
     const motorData = await this.model.read(id);
@@ -149,6 +156,8 @@ class StepperMotorService {
       this.isRunning = false;
       this.model.setStatus(id, 'closed');
     }
+
+    return true;
   }
 
   /**
