@@ -3,9 +3,10 @@ import StepperMotorModel from "../models/StepperMotorModel";
 import client from '../services/redisService';
 
 interface MotorData {
-  id: string;
+  id: number;
   pins: number[];
   doorNumber: number;
+  status: string;
 }
 
 /**
@@ -81,7 +82,7 @@ class StepperMotorService {
       for (let i = 0; i < this.stepPerRevolution; i++) {
         this.setStep(pins);
 
-        this.stepCounter += 12;
+        this.stepCounter++;
         if (this.stepCounter == this.maxSteps) {
           this.stepCounter = 0;
         }
@@ -90,6 +91,7 @@ class StepperMotorService {
       }
 
       this.stop(pins);
+      this.model.setStatus(id, 'opened');
     }
   }
 
@@ -110,7 +112,7 @@ class StepperMotorService {
       for (let i = 0; i < this.stepPerRevolution; i++) {
         this.setStep(pins);
 
-        this.stepCounter -= 1;
+        this.stepCounter--;
         if (this.stepCounter < 0) {
           this.stepCounter = this.maxSteps - 1;
         }
@@ -119,6 +121,7 @@ class StepperMotorService {
       }
 
       this.stop(pins);
+      this.model.setStatus(id, 'closed');
     }
   }
 

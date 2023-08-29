@@ -16,5 +16,8 @@ router.post('/doors/create', door.create);
 router.get('/doors/:id', async (req: Request, res: Response) => {
     await door.read(req, res);
 });
+router.get('/doors/:id/status', async (req: Request, res: Response) => {
+    await door.status(req, res)
+});
 
 module.exports = router;
