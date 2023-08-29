@@ -73,8 +73,8 @@ class DoorService {
   async status(req: Request, res: Response) {
     try {
       const id = parseInt(req.params.id);
-      const motor = await this.stepperMotor.readMotor(id);
-      res.status(200).json({ status: motor.status });
+      const status = await this.stepperMotor.getStatus(id);
+      res.status(200).json({ status: status });
     } catch (error: any) {
       res.status(500).json({ error: "Failed to get the status of the door" });
     }

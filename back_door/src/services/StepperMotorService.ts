@@ -13,12 +13,14 @@ interface MotorData {
  * Service for controlling stepper motors.
  */
 class StepperMotorService {
-  stepPerRevolution: number = 4076;
-  model: StepperMotorModel;
-  delayBetweenStep: number = 0.005;
-  stepCounter: number = 0;
-  maxSteps: number = 8;
-  seq: number[][] = [
+  private static instance: StepperMotorService | null = null;
+  private stepPerRevolution: number = 4076;
+  private model: StepperMotorModel;
+  private delayBetweenStep: number = 0.005;
+  private stepCounter: number = 0;
+  private maxSteps: number = 8;
+  private isRunning: boolean = false;
+  private seq: number[][] = [
     [1, 0, 0, 0],
     [1, 1, 0, 0],
     [0, 1, 0, 0],
@@ -31,6 +33,13 @@ class StepperMotorService {
 
   constructor() {
     this.model = new StepperMotorModel(client);
+  }
+
+  static getInstance(): StepperMotorService {
+    if (!this.instance) {
+      this.instance = new StepperMotorService();
+    }
+    return this.instance;
   }
 
   /**
@@ -67,14 +76,24 @@ class StepperMotorService {
     return motor;
   }
 
+  async getStatus(id: number) {
+    const status = await this.model.getStatus(id);
+    return status;
+  }
+
   /**
    * Rotate the motor clockwise.
    * @param id - The ID of the motor to rotate.
    */
   async rotateClockwise(id: number): Promise<void> {
+    if (this.isRunning) {
+      return;
+    }
+
     const motorData = await this.model.read(id);
 
-    if (motorData) {
+    if (motorData && motorData.status === 'closed') {
+      this.isRunning = true;
       const pins: Gpio[] = motorData.pins.map(
         (pin: number) => new Gpio(pin, 'out')
       );
@@ -91,6 +110,7 @@ class StepperMotorService {
       }
 
       this.stop(pins);
+      this.isRunning = false;
       this.model.setStatus(id, 'opened');
     }
   }
@@ -100,9 +120,14 @@ class StepperMotorService {
    * @param id - The ID of the motor to rotate.
    */
   async rotateCounterClockwise(id: number): Promise<void> {
+    if (this.isRunning) {
+      return;
+    }
+
     const motorData = await this.model.read(id);
 
-    if (motorData) {
+    if (motorData && motorData.status === 'opened') {
+      this.isRunning = true;
       const pins: Gpio[] = motorData.pins.map(
         (pin: number) => new Gpio(pin, 'out')
       );
@@ -121,6 +146,7 @@ class StepperMotorService {
       }
 
       this.stop(pins);
+      this.isRunning = false;
       this.model.setStatus(id, 'closed');
     }
   }
