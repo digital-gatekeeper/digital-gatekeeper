@@ -11,8 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.digtalGateKeeper.back.modele.Hotels;
+import com.digtalGateKeeper.back.model.Hotels;
 import com.digtalGateKeeper.back.service.HotelsService;
+import com.digtalGateKeeper.back.utils.LogUtils;
 
 import lombok.AllArgsConstructor;
 
@@ -20,38 +21,38 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/hotels")
 @AllArgsConstructor
 public class HotelsController {
-    
+
     private final HotelsService hotelsService;
+    private final LogUtils logUtils = new LogUtils();
 
     @PostMapping("/create")
-    public Hotels create(@RequestBody Hotels hotel)
-    {
+    public Hotels create(@RequestBody Hotels hotel) {
+        logUtils.log("create hotel: " + hotel + " at " + java.time.LocalDateTime.now());
         return hotelsService.createHotels(hotel);
     }
 
-    @GetMapping("/read")
-    public List<Hotels> readAll()
-    {
+    @GetMapping("/get")
+    public List<Hotels> readAll() {
+        logUtils.log("read all hotels at " + java.time.LocalDateTime.now());
         return hotelsService.getAllHotels();
     }
 
-    @GetMapping("/read/{id}")
-    public Hotels readOne(@PathVariable Long id)
-    {
+    @GetMapping("/get/{id}")
+    public Hotels readOne(@PathVariable Long id) {
+        logUtils.log("read hotel with id: " + id + " at " + java.time.LocalDateTime.now());
         return hotelsService.getHotelsById(id);
     }
 
     @PutMapping("/update/{id}")
-    public Hotels update(@PathVariable Long id, @RequestBody Hotels hotel)
-    {
+    public Hotels update(@PathVariable Long id, @RequestBody Hotels hotel) {
+        logUtils.log("update hotel with id: " + id + " at " + java.time.LocalDateTime.now());
         return hotelsService.updateHotels(id, hotel);
     }
 
     @DeleteMapping("/delete/{id}")
-    public String delete(@PathVariable Long id)
-    {
+    public String delete(@PathVariable Long id) {
+        logUtils.log("delete hotel with id: " + id + " at " + java.time.LocalDateTime.now());
         return hotelsService.deleteHotels(id);
     }
-
 
 }

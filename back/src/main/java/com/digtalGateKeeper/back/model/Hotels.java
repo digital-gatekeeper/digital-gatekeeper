@@ -1,4 +1,4 @@
-package com.digtalGateKeeper.back.modele;
+package com.digtalGateKeeper.back.model;
 
 import lombok.Setter;
 import lombok.Getter;
@@ -11,11 +11,10 @@ import jakarta.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Hotels
-{
+public class Hotels {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name; 
+    private String name;
 }
