@@ -1,9 +1,10 @@
 import { RedisClientType } from 'redis';
 
 interface MotorData {
-  id: string;
+  id: number;
   pins: number[];
   doorNumber: number;
+  status: string;
 }
 
 /**
@@ -36,7 +37,6 @@ class StepperMotorModel {
       if (!motor) {
         throw new Error('Motor not created');
       }
-
     } catch (error: any) {
       console.log(error.message);
     }
@@ -56,9 +56,8 @@ class StepperMotorModel {
       )
 
       if (!motor) {
-        throw new Error('Motor not created');
+        throw new Error('Failed to update the motor data');
       }
-
     } catch (error: any) {
       console.log(error.message);
     }
@@ -79,7 +78,7 @@ class StepperMotorModel {
    * @returns {Promise<any>} A promise that resolves with the motor data.
    * @throws {Error} If no data is found for the motor.
    */
-  async read(id: number) {
+  async read(id: number): Promise<any> {
     try {
       const motor = await this.client.get(`motor:${id}`);
 
@@ -88,6 +87,52 @@ class StepperMotorModel {
       }
 
       return JSON.parse(motor);
+    } catch (error: any) {
+      console.log(error.message);
+    }
+  }
+
+  /**
+   * Set the status of a motor.
+   * @param {number} id - The ID of the motor.
+   * @param {string} status - The new status of the motor.
+   * @returns {Promise<any>} A promise that resolves when the status is set.
+   * @throws {Error} If no data is found for the motor.
+   */
+  async setStatus(id: number, status: string): Promise<any> {
+    try {
+      const motor = await this.client.get(`motor:${id}`);
+
+      if (!motor) {
+        throw new Error('No data for the motor');
+      }
+
+      const motorData = JSON.parse(motor);
+      motorData.status = status;
+      this.update(motorData);
+    } catch (error: any) {
+      console.log(error.message);
+    }
+  }
+
+  /**
+   * Get the status of a motor.
+   * @param {number} id - The ID of the motor.
+   * @returns {Promise<any>} A promise that resolves with the status of the motor.
+   * @throws {Error} If no data is found for the motor.
+   */
+  async getStatus(id: number): Promise<any> {
+    try {
+      const motor = await this.client.get(`motor:${id}`);
+
+      if (!motor) {
+        throw new Error('No data for the motor');
+      }
+
+      const motorData = JSON.parse(motor)
+      const status: string = motorData.status;
+
+      return status;
     } catch (error: any) {
       console.log(error.message);
     }

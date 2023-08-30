@@ -2,9 +2,10 @@ import { Request, Response } from 'express';
 import StepperMotorService from './StepperMotorService';
 
 interface MotorData {
-  id: string;
+  id: number;
   pins: number[];
   doorNumber: number;
+  status: string;
 }
 
 class DoorService {
@@ -17,9 +18,10 @@ class DoorService {
   create = (req: Request, res: Response) => {
     try {
       const motorData: MotorData = {
-        id: req.body.doorId,
+        id: parseInt(req.body.doorId),
         pins: req.body.pins,
-        doorNumber: parseInt(req.body.doorId)
+        doorNumber: parseInt(req.body.doorId),
+        status: 'closed'
       };
 
       this.stepperMotor.createMotor(motorData);
@@ -36,36 +38,46 @@ class DoorService {
       const motor = await this.stepperMotor.readMotor(id);
 
       if (!motor) {
-        res.status(404).json({ success: false, error: 'Door not found' });
+        res.status(404).json({ error: 'Door not found' });
         return;
       }
 
-      res.status(200).json({ success: true, data: motor });
+      res.status(200).json({ data: motor });
     } catch (error: any) {
       res.status(500).json({ error: "Failed to retrieve door data" });
     }
   }
 
-  open = (req: Request, res: Response) => {
+  async open(req: Request, res: Response) {
     try {
       const doorId: number = parseInt(req.params.id);
-      this.stepperMotor.rotateClockwise(doorId);
-      res.status(200).json({ success: true });
+      const success: boolean = await this.stepperMotor.rotateClockwise(doorId);
+      res.status(200).json({ success: success });
     } catch (error: any) {
       res.status(500).json({ error: "Failed to open the door" });
     }
 
   }
 
-  close = (req: Request, res: Response) => {
+  async close(req: Request, res: Response) {
     try {
       const doorId: number = parseInt(req.params.id);
-      this.stepperMotor.rotateCounterClockwise(doorId);
-      res.status(200).json({ success: true });
-    } catch (error) {
+      const success: boolean = await this.stepperMotor.rotateCounterClockwise(doorId);
+      res.status(200).json({ success: success });
+    } catch (error: any) {
       res.status(500).json({ error: "Failed to close the door" });
     }
 
+  }
+
+  async status(req: Request, res: Response) {
+    try {
+      const id = parseInt(req.params.id);
+      const status = await this.stepperMotor.getStatus(id);
+      res.status(200).json({ status: status });
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to get the status of the door" });
+    }
   }
 }
 
