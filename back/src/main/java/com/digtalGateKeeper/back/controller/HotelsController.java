@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.digtalGateKeeper.back.model.Hotels;
+import com.digtalGateKeeper.back.model.Rooms;
 import com.digtalGateKeeper.back.service.HotelsService;
 import com.digtalGateKeeper.back.utils.LogUtils;
 
@@ -53,6 +54,21 @@ public class HotelsController {
     public String delete(@PathVariable Long id) {
         logUtils.log("delete hotel with id: " + id + " at " + java.time.LocalDateTime.now());
         return hotelsService.deleteHotels(id);
+    }
+
+    @GetMapping("/{id}/rooms")
+    public List<Rooms> readRooms(@PathVariable Long id)
+    {
+        logUtils.log("read all rooms from hotel with id: " + id + " at " + java.time.LocalDateTime.now());
+        return hotelsService.getRoomsByHotels(id);
+    
+    }
+
+    @DeleteMapping("/{id}/rooms")
+    public String deleteRooms(@PathVariable Long id)
+    {
+        logUtils.log("delete all rooms from hotel with id: " + id + " at " + java.time.LocalDateTime.now());
+        return hotelsService.deleteRoomsByHotels(id);
     }
 
 }
