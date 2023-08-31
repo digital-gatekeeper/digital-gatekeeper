@@ -1,2 +1,8 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<script>
+    import Serrure from './Serrure.svelte';
+</script>
+
+<main>
+    <h1>Cliquer pour déverouiller ou vérrouiller</h1>
+    <Serrure />
+</main>
