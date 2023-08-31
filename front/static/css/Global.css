@@ -1,0 +1,27 @@
+/* Assurez-vous que le body et le html ont une hauteur de 100% */
+body, html {
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center; /* Centrage horizontal */
+    align-items: center;     /* Centrage vertical */
+
+}
+
+/* Utilisez flexbox pour centrer le contenu */
+main {
+    display: flex;
+    justify-content: center; /* Centrage horizontal */
+    align-items: center;     /* Centrage vertical */
+    flex-direction: column;
+    min-height: 100%;
+}
+
+h1 {
+    text-align: center;
+    color: black;
+    font-family: "JetBrains Mono Medium";
+}
+
+
