@@ -2,6 +2,7 @@ package com.digtalGateKeeper.back.service;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.digtalGateKeeper.back.model.Persons;
@@ -16,6 +17,9 @@ import lombok.AllArgsConstructor;
 public class PersonsServiceImpl implements PersonsService {
 
     private final PersonsRepository personsRepository;
+
+    @Autowired
+    private PasswordService passwordService;
 
     @Override
     public Persons createPersons(Persons Persons) {
@@ -33,7 +37,7 @@ public class PersonsServiceImpl implements PersonsService {
         .map(p -> 
         {
             p.setEmail(Persons.getEmail());
-            p.setNumero(Persons.getPassword());
+            p.setPassword(Persons.getPassword(), passwordService);
             p.setRole(Persons.getRole());
             p.setNumero(Persons.getNumero());
             p.setName(Persons.getName());
