@@ -1,0 +1,11 @@
+Licence de Visualisation Uniquement
+
+Cette licence autorise la visualisation du code source uniquement. Vous avez le droit de consulter et d'examiner le code source, mais vous n'avez pas le droit de l'utiliser à des fins de développement, de modification, de distribution ou à toute autre fin.
+
+Les membres de l'équipe digital-gatekeeper ont le droit de modifier ce code source et de le vendre sous un autre nom, sans restriction.
+
+Vous ne pouvez pas utiliser ce code source pour créer des produits dérivés, ni pour toute autre activité autre que la visualisation personnelle.
+
+Copyright 2023 digital-gatekeeper
+
+digital-gatekeeper détient tous les droits sur ce code source.
