@@ -1,0 +1,18 @@
+version: '3'
+services:
+  app:
+    build: .
+    restart: always
+    volumes:
+      - ./:/app
+      - /node_modules
+    ports:
+      - '8001:8000'
+
+  db:
+    image: redis:7.0-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    volumes:
+      - ./config/redis.conf:/var/lib/redis/redis.conf
